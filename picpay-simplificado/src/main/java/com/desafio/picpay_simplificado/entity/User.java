@@ -1,6 +1,16 @@
 package com.desafio.picpay_simplificado.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +20,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -43,7 +55,14 @@ public class User implements Serializable {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    private enum Role {
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Wallet wallet;
+    @OneToMany(mappedBy = "payer")
+    private List<Transaction> sentTransactions = new ArrayList<>();
+    @OneToMany(mappedBy = "payee")
+    private List<Transaction> receivedTransactions = new ArrayList<>();
+
+    public enum Role {
         USUARIO, LOJISTA
     }
 
