@@ -37,7 +37,7 @@ public class Wallet implements Serializable {
     private BigDecimal balance = BigDecimal.ZERO;
 
     @OneToOne
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
     private User user;
 
     @CreationTimestamp
