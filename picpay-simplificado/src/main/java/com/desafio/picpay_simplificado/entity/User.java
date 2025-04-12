@@ -39,8 +39,8 @@ public class User implements Serializable {
 
     @Column(nullable = false, length = 120)
     private String name;
-    @Column(unique = true, nullable = false, length = 18, name = "cpf_or_cnpj")
-    private String cpfOrCnpj;
+    @Column(unique = true, nullable = false, length = 18)
+    private String document;
     @Column(unique = true, nullable = false, length = 100)
     private String email;
     @Column(nullable = false, length = 200)
@@ -48,23 +48,19 @@ public class User implements Serializable {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
-    private Role role;
+    private UserRole role;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Wallet wallet;
     @OneToMany(mappedBy = "payer")
     private List<Transaction> sentTransactions = new ArrayList<>();
     @OneToMany(mappedBy = "payee")
     private List<Transaction> receivedTransactions = new ArrayList<>();
-
-    public enum Role {
-        USUARIO, LOJISTA
-    }
 
     @Override
     public boolean equals(Object o) {
