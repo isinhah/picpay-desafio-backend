@@ -11,9 +11,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @NoArgsConstructor
@@ -36,6 +38,9 @@ public class Transaction implements Serializable {
 
     @ManyToOne(optional = false)
     private User payee;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
     @Override
     public boolean equals(Object o) {
