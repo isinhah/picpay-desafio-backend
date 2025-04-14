@@ -1,5 +1,6 @@
 package com.desafio.picpay_simplificado.entity;
 
+import com.desafio.picpay_simplificado.entity.enums.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

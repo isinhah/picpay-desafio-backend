@@ -1,7 +1,7 @@
 package com.desafio.picpay_simplificado.web.mapper;
 
 import com.desafio.picpay_simplificado.entity.User;
-import com.desafio.picpay_simplificado.entity.UserRole;
+import com.desafio.picpay_simplificado.entity.enums.UserRole;
 import com.desafio.picpay_simplificado.web.dto.UserRequestDto;
 import com.desafio.picpay_simplificado.web.dto.UserResponseDto;
 import org.mapstruct.Mapper;

@@ -2,7 +2,7 @@ package com.desafio.picpay_simplificado.service;
 
 import com.desafio.picpay_simplificado.entity.Transaction;
 import com.desafio.picpay_simplificado.entity.User;
-import com.desafio.picpay_simplificado.entity.UserRole;
+import com.desafio.picpay_simplificado.entity.enums.UserRole;
 import com.desafio.picpay_simplificado.entity.Wallet;
 import com.desafio.picpay_simplificado.repository.TransactionRepository;
 import com.desafio.picpay_simplificado.repository.UserRepository;
@@ -25,6 +25,7 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public Page<TransactionResponseDto> findTransactionsByUser(UUID userId, Pageable pageable) {
@@ -33,18 +34,33 @@ public class TransactionService {
     }
 
     @Transactional
-    public TransactionResponseDto createTransaction(TransactionRequestDto requestDto) {
+    public TransactionResponseDto create(TransactionRequestDto requestDto) {
         User payer = findUserById(requestDto.payerId());
         User payee = findUserById(requestDto.payeeId());
 
-        validatePayerBalance(payer, requestDto.amount());
         validateTypeOfPayer(payer);
+
+//        if (!notificationService.isAuthorized()) {
+//            throw new RuntimeException("Unauthorized transaction.");
+//        }
+
+        validatePayerBalance(payer, requestDto.amount());
+
+        transferAmount(payer.getWallet(), payee.getWallet(), requestDto.amount());
 
         Transaction transaction = TransactionMapper.INSTANCE.toEntity(requestDto, payer, payee);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
+//        notificationService.sendNotification(payee.getEmail());
+
         return TransactionMapper.INSTANCE.toDto(savedTransaction);
+    }
+
+    public void validateTypeOfPayer(User payer) {
+        if (payer.getRole() == UserRole.MERCHANT) {
+            throw new IllegalArgumentException("Merchants cannot send money, only receive.");
+        }
     }
 
     public void validatePayerBalance(User payer, BigDecimal amount) {
@@ -55,10 +71,9 @@ public class TransactionService {
         }
     }
 
-    public void validateTypeOfPayer(User payer) {
-        if (payer.getRole() == UserRole.MERCHANT) {
-            throw new IllegalArgumentException("Merchants cannot send money, only receive.");
-        }
+    private void transferAmount(Wallet payerWallet, Wallet payeeWallet, BigDecimal amount) {
+        payerWallet.setBalance(payerWallet.getBalance().subtract(amount));
+        payeeWallet.setBalance(payeeWallet.getBalance().add(amount));
     }
 
     private User findUserById(UUID id) {
