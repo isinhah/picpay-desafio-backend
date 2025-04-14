@@ -9,6 +9,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.UUID;
+
 @Mapper
 public interface TransactionMapper {
 
@@ -17,10 +19,12 @@ public interface TransactionMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(source = "amount", target = "amount")
-    @Mapping(source = "payerId", target = "payer")
-    @Mapping(source = "payeeId", target = "payee")
+    @Mapping(source = "payerId", target = "payer.id")
+    @Mapping(source = "payeeId", target = "payee.id")
     Transaction toTransaction(TransactionRequestDto requestDto);
 
+    @Mapping(source = "payer.id", target = "payer")
+    @Mapping(source = "payee.id", target = "payee")
     TransactionResponseDto toDto(Transaction transaction);
 
     @Mapping(target = "id", ignore = true)
@@ -29,6 +33,13 @@ public interface TransactionMapper {
     @Mapping(source = "payerId", target = "payer")
     @Mapping(source = "payeeId", target = "payee")
     void updateFromDto(TransactionRequestDto updateDto, @MappingTarget Transaction transaction);
+
+    default User map(UUID id) {
+        if (id == null) return null;
+        User user = new User();
+        user.setId(id);
+        return user;
+    }
 
     default Transaction toEntity(TransactionRequestDto dto, User payer, User payee) {
         Transaction transaction = new Transaction();

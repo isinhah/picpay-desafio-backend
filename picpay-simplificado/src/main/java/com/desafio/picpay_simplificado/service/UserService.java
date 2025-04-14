@@ -4,7 +4,7 @@ import com.desafio.picpay_simplificado.entity.User;
 import com.desafio.picpay_simplificado.entity.Wallet;
 import com.desafio.picpay_simplificado.repository.UserRepository;
 import com.desafio.picpay_simplificado.repository.WalletRepository;
-import com.desafio.picpay_simplificado.web.dto.UserRegisterDto;
+import com.desafio.picpay_simplificado.web.dto.UserRequestDto;
 import com.desafio.picpay_simplificado.web.dto.UserResponseDto;
 import com.desafio.picpay_simplificado.web.mapper.UserMapper;
 import jakarta.persistence.EntityNotFoundException;
@@ -36,7 +36,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDto create(UserRegisterDto registerDto) {
+    public UserResponseDto create(UserRequestDto registerDto) {
         validateUserEmailAndDocument(registerDto.email(), registerDto.document());
         validateUserRoleAndDocument(registerDto.role(), registerDto.document());
 
@@ -51,7 +51,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDto update(UUID id, UserRegisterDto updateDto) {
+    public UserResponseDto update(UUID id, UserRequestDto updateDto) {
         User existingUser = findUserById(id);
         validateUserUpdateEmailAndDocument(id, updateDto.email(), updateDto.document());
         validateUserRoleAndDocument(updateDto.role(), updateDto.document());

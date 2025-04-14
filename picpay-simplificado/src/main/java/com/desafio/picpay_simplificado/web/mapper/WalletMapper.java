@@ -21,7 +21,7 @@ public interface WalletMapper {
     @Mapping(target = "balance", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(source = "userId", target = "user")
+    @Mapping(source = "userId", target = "user.id")
     Wallet toWallet(WalletRequestDto requestDto);
 
     @Mapping(source = "user.id", target = "userId")
