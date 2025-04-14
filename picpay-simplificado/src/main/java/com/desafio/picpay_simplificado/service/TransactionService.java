@@ -8,6 +8,7 @@ import com.desafio.picpay_simplificado.repository.TransactionRepository;
 import com.desafio.picpay_simplificado.repository.UserRepository;
 import com.desafio.picpay_simplificado.web.dto.TransactionRequestDto;
 import com.desafio.picpay_simplificado.web.dto.TransactionResponseDto;
+import com.desafio.picpay_simplificado.web.exception.TransactionException;
 import com.desafio.picpay_simplificado.web.mapper.TransactionMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +60,7 @@ public class TransactionService {
 
     public void validateTypeOfPayer(User payer) {
         if (payer.getRole() == UserRole.MERCHANT) {
-            throw new IllegalArgumentException("Merchants cannot send money, only receive.");
+            throw new TransactionException("Merchants cannot send money, only receive.");
         }
     }
 
@@ -67,7 +68,7 @@ public class TransactionService {
         Wallet payerWallet = payer.getWallet();
 
         if (payerWallet == null || payerWallet.getBalance().compareTo(amount) < 0) {
-            throw new IllegalArgumentException("Insufficient balance for the transaction.");
+            throw new TransactionException("Insufficient balance for the transaction.");
         }
     }
 

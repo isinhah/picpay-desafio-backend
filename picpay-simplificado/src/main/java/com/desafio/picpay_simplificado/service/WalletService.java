@@ -5,6 +5,7 @@ import com.desafio.picpay_simplificado.repository.UserRepository;
 import com.desafio.picpay_simplificado.repository.WalletRepository;
 import com.desafio.picpay_simplificado.web.dto.WalletDepositDto;
 import com.desafio.picpay_simplificado.web.dto.WalletResponseDto;
+import com.desafio.picpay_simplificado.web.exception.WalletNotFoundException;
 import com.desafio.picpay_simplificado.web.mapper.WalletMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class WalletService {
 
     private Wallet findWalletByUserId(UUID userId) {
         return walletRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Wallet not found for user with id: " + userId));
+                .orElseThrow(() -> new WalletNotFoundException("Wallet not found for user with id: " + userId));
     }
 
     private void findUserById(UUID userId) {

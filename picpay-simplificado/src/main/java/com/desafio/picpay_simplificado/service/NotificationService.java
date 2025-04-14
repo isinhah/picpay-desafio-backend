@@ -1,5 +1,6 @@
 package com.desafio.picpay_simplificado.service;
 
+import com.desafio.picpay_simplificado.web.exception.NotificationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -17,7 +18,7 @@ public class NotificationService {
             String response = restTemplate.getForObject("https://util.devi.tools/api/v2/authorize", String.class);
             return response != null && response.contains("Authorized");
         } catch (Exception e) {
-            return false;
+            throw new NotificationException("Error occurred during authorization: " + e.getMessage());
         }
     }
 
@@ -29,7 +30,7 @@ public class NotificationService {
             );
             restTemplate.postForObject("https://util.devi.tools/api/v1/notify", payload, String.class);
         } catch (Exception e) {
-            System.err.println("Error by sending notification: " + e.getMessage());
+            throw new NotificationException("Error sending notification to " + email + ": " + e.getMessage());
         }
     }
 }
