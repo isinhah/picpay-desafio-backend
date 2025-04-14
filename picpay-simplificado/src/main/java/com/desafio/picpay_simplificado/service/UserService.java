@@ -7,6 +7,7 @@ import com.desafio.picpay_simplificado.repository.WalletRepository;
 import com.desafio.picpay_simplificado.web.dto.UserRequestDto;
 import com.desafio.picpay_simplificado.web.dto.UserResponseDto;
 import com.desafio.picpay_simplificado.web.mapper.UserMapper;
+import com.desafio.picpay_simplificado.web.mapper.WalletMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -43,8 +44,7 @@ public class UserService {
         User userToSave = UserMapper.INSTANCE.toUser(registerDto);
         User savedUser = userRepository.save(userToSave);
 
-        Wallet wallet = new Wallet();
-        wallet.setUser(savedUser);
+        Wallet wallet = WalletMapper.INSTANCE.createWallet(savedUser);
         walletRepository.save(wallet);
 
         return UserMapper.INSTANCE.toDto(savedUser);

@@ -1,12 +1,10 @@
 package com.desafio.picpay_simplificado.service;
 
-import com.desafio.picpay_simplificado.entity.User;
 import com.desafio.picpay_simplificado.entity.Wallet;
 import com.desafio.picpay_simplificado.repository.UserRepository;
 import com.desafio.picpay_simplificado.repository.WalletRepository;
-import com.desafio.picpay_simplificado.web.dto.WalletRequestDto;
+import com.desafio.picpay_simplificado.web.dto.WalletDepositDto;
 import com.desafio.picpay_simplificado.web.dto.WalletResponseDto;
-import com.desafio.picpay_simplificado.web.dto.WalletUpdateDto;
 import com.desafio.picpay_simplificado.web.mapper.WalletMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -23,27 +21,17 @@ public class WalletService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public WalletResponseDto findWalletByUser(UUID userId) {
+    public WalletResponseDto findByUser(UUID userId) {
         Wallet wallet = findWalletByUserId(userId);
         return WalletMapper.INSTANCE.toDto(wallet);
     }
 
     @Transactional
-    public WalletResponseDto createWallet(WalletRequestDto requestDto) {
-        User user = findUserById(requestDto.userId());
-
-        Wallet wallet = WalletMapper.INSTANCE.toEntity(requestDto, user);
-
-        Wallet savedWallet = walletRepository.save(wallet);
-        return WalletMapper.INSTANCE.toDto(savedWallet);
-    }
-
-    @Transactional
-    public WalletResponseDto updateWallet(UUID userId, WalletUpdateDto updateDto) {
+    public WalletResponseDto depositToWallet(UUID userId, WalletDepositDto depositDto) {
         findUserById(userId);
         Wallet wallet = findWalletByUserId(userId);
 
-        WalletMapper.INSTANCE.updateFromDto(updateDto, wallet);
+        wallet.setBalance(wallet.getBalance().add(depositDto.amount()));
 
         Wallet updatedWallet = walletRepository.save(wallet);
         return WalletMapper.INSTANCE.toDto(updatedWallet);
@@ -54,8 +42,8 @@ public class WalletService {
                 .orElseThrow(() -> new EntityNotFoundException("Wallet not found for user with id: " + userId));
     }
 
-    private User findUserById(UUID userId) {
-        return userRepository.findById(userId)
+    private void findUserById(UUID userId) {
+        userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
     }
 }
