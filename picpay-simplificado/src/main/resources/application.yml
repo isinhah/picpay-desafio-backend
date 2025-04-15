@@ -15,3 +15,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+
+api:
+  security:
+    token:
+      secret: my-secret-key
+
+cors:
+  allowed:
+    origins: http://localhost:8080

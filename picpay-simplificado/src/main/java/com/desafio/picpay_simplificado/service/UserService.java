@@ -13,6 +13,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final WalletRepository walletRepository;
     private final UserValidator userValidator;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     public UserResponseDto findById(UUID id) {
@@ -43,7 +45,15 @@ public class UserService {
         userValidator.validateUserEmailAndDocument(registerDto.email(), registerDto.document());
         userValidator.validateUserRoleAndDocument(registerDto.role(), registerDto.document());
 
-        User userToSave = UserMapper.INSTANCE.toUser(registerDto);
+        UserRequestDto encodedDto = new UserRequestDto(
+                registerDto.name(),
+                registerDto.document(),
+                registerDto.email(),
+                passwordEncoder.encode(registerDto.password()),
+                registerDto.role()
+        );
+
+        User userToSave = UserMapper.INSTANCE.toUser(encodedDto);
         User savedUser = userRepository.save(userToSave);
 
         Wallet wallet = WalletMapper.INSTANCE.createWallet(savedUser);
@@ -58,7 +68,15 @@ public class UserService {
         userValidator.validateUserUpdateEmailAndDocument(id, updateDto.email(), updateDto.document());
         userValidator.validateUserRoleAndDocument(updateDto.role(), updateDto.document());
 
-        UserMapper.INSTANCE.updateFromDto(updateDto, existingUser);
+        UserRequestDto encodedDto = new UserRequestDto(
+                updateDto.name(),
+                updateDto.document(),
+                updateDto.email(),
+                passwordEncoder.encode(updateDto.password()),
+                updateDto.role()
+        );
+
+        UserMapper.INSTANCE.updateFromDto(encodedDto, existingUser);
 
         User updatedUser = userRepository.save(existingUser);
         return UserMapper.INSTANCE.toDto(updatedUser);
@@ -71,8 +89,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    private User findUserById(UUID id) {
+    public User findUserById(UUID id) {
         return userRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User with id: '%s' not found", id)));
+    }
+
+    @Transactional(readOnly = true)
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow(
+                () -> new EntityNotFoundException(String.format("User with email: '%s' not found", email)));
     }
 }
