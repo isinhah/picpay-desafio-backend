@@ -2,6 +2,7 @@ package com.desafio.picpay_simplificado.utils;
 
 import com.desafio.picpay_simplificado.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -11,6 +12,7 @@ import java.util.UUID;
 public class UserValidator {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public void validateUserRoleAndDocument(String role, String document) {
         if (role.equalsIgnoreCase("USER") && document.length() != 11) {
@@ -44,5 +46,9 @@ public class UserValidator {
                 throw new IllegalArgumentException("This document (CPF/CNPJ) is already registered to another user.");
             }
         });
+    }
+
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
     }
 }
