@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -21,7 +20,7 @@ public class WalletService {
     private final WalletRepository walletRepository;
 
     @Transactional(readOnly = true)
-    public WalletResponseDto findByUser(UUID userId) {
+    public WalletResponseDto findByUser(Long userId) {
         Wallet wallet = findWalletByUserId(userId);
         return WalletMapper.INSTANCE.toDto(wallet);
     }
@@ -34,7 +33,7 @@ public class WalletService {
     }
 
     @Transactional
-    public WalletResponseDto depositToWallet(UUID userId, WalletDepositDto depositDto) {
+    public WalletResponseDto depositToWallet(Long userId, WalletDepositDto depositDto) {
         Wallet wallet = findWalletByUserId(userId);
         wallet.setBalance(wallet.getBalance().add(depositDto.amount()));
 
@@ -42,7 +41,7 @@ public class WalletService {
         return WalletMapper.INSTANCE.toDto(updatedWallet);
     }
 
-    private Wallet findWalletByUserId(UUID userId) {
+    private Wallet findWalletByUserId(Long userId) {
         return walletRepository.findByUserId(userId)
                 .orElseThrow(() -> new WalletNotFoundException("Wallet not found for user with id: " + userId));
     }

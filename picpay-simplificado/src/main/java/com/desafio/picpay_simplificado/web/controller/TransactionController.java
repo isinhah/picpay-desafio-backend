@@ -15,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/transactions")
@@ -32,7 +30,7 @@ public class TransactionController {
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<TransactionResponseDto>> getUserTransactions(
-            @PathVariable UUID userId,
+            @PathVariable Long userId,
             Pageable pageable
     ) {
         Page<TransactionResponseDto> transactions = transactionService.findTransactionsByUser(userId, pageable);

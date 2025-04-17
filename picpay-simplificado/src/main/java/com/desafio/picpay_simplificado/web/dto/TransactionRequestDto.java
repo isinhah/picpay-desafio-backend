@@ -4,7 +4,6 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 public record TransactionRequestDto(
 
@@ -13,9 +12,9 @@ public record TransactionRequestDto(
         BigDecimal amount,
 
         @NotNull(message = "Payer ID is required")
-        UUID payerId,
+        Long payerId,
 
         @NotNull(message = "Payee ID is required")
-        UUID payeeId
+        Long payeeId
 ) {
 }

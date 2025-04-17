@@ -28,7 +28,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         String token = extractToken(request);
 
         if (token != null && tokenService.isTokenValid(token)) {
-            UUID userId = tokenService.getUserIdFromToken(token);
+            Long userId = tokenService.getUserIdFromToken(token);
             String role = tokenService.getUserRoleFromToken(token);
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(

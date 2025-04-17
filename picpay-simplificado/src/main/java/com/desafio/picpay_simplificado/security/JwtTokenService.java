@@ -41,13 +41,13 @@ public class JwtTokenService {
         }
     }
 
-    public UUID getUserIdFromToken(String token) {
+    public Long getUserIdFromToken(String token) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         String subject = JWT.require(algorithm)
                 .build()
                 .verify(token)
                 .getSubject();
-        return UUID.fromString(subject);
+        return Long.parseLong(subject);
     }
 
     public String getUserRoleFromToken(String token) {

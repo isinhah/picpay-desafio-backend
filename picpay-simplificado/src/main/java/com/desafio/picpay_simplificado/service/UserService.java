@@ -13,8 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -24,7 +22,7 @@ public class UserService {
     private final UserValidator userValidator;
 
     @Transactional(readOnly = true)
-    public UserResponseDto findById(UUID id) {
+    public UserResponseDto findById(Long id) {
         User user = findUserById(id);
         return UserMapper.INSTANCE.toDto(user);
     }
@@ -59,7 +57,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDto update(UUID id, UserRequestDto updateDto) {
+    public UserResponseDto update(Long id, UserRequestDto updateDto) {
         User existingUser = findUserById(id);
 
         userValidator.validateUserUpdateEmailAndDocument(id, updateDto.email(), updateDto.document());
@@ -82,12 +80,12 @@ public class UserService {
     }
 
     @Transactional
-    public void delete(UUID id) {
+    public void delete(Long id) {
         User user = findUserById(id);
         userRepository.delete(user);
     }
 
-    public User findUserById(UUID id) {
+    public User findUserById(Long id) {
         return userRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(String.format("User with id: '%s' not found", id)));
     }

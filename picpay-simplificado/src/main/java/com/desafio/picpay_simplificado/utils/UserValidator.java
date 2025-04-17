@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @RequiredArgsConstructor
 @Component
 public class UserValidator {
@@ -34,7 +32,7 @@ public class UserValidator {
         }
     }
 
-    public void validateUserUpdateEmailAndDocument(UUID userId, String email, String document) {
+    public void validateUserUpdateEmailAndDocument(Long userId, String email, String document) {
         userRepository.findByEmail(email).ifPresent(user -> {
             if (!user.getId().equals(userId)) {
                 throw new IllegalArgumentException("This email is already registered to another user.");
