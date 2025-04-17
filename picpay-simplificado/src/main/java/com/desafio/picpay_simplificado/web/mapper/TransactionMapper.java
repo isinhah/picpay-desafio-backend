@@ -9,8 +9,6 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
-import java.util.UUID;
-
 @Mapper
 public interface TransactionMapper {
 
@@ -34,7 +32,7 @@ public interface TransactionMapper {
     @Mapping(source = "payeeId", target = "payee")
     void updateFromDto(TransactionRequestDto updateDto, @MappingTarget Transaction transaction);
 
-    default User map(UUID id) {
+    default User map(Long id) {
         if (id == null) return null;
         User user = new User();
         user.setId(id);

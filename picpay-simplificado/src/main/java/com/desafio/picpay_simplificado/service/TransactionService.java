@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -29,8 +28,8 @@ public class TransactionService {
     private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
-    public Page<TransactionResponseDto> findTransactionsByUser(UUID userId, Pageable pageable) {
-        return transactionRepository.findAllByPayee_Id(userId, pageable)
+    public Page<TransactionResponseDto> findTransactionsByUser(Long userId, Pageable pageable) {
+        return transactionRepository.findAllByPayer_IdOrPayee_Id(userId, userId, pageable)
                 .map(TransactionMapper.INSTANCE::toDto);
     }
 
@@ -77,7 +76,7 @@ public class TransactionService {
         payeeWallet.setBalance(payeeWallet.getBalance().add(amount));
     }
 
-    private User findUserById(UUID id) {
+    private User findUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
     }
