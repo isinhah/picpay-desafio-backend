@@ -13,7 +13,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.UUID;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
@@ -29,7 +28,7 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         if (token != null && tokenService.isTokenValid(token)) {
             Long userId = tokenService.getUserIdFromToken(token);
-            String role = tokenService.getUserRoleFromToken(token);
+            String role = "ROLE_" + tokenService.getUserRoleFromToken(token);
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userId,

@@ -32,16 +32,16 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/api/users").hasAuthority("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/users/{userId}").hasAnyAuthority("USER", "MERCHANT", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/users/{userId}").hasAnyAuthority("USER", "MERCHANT", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/{userId}").hasAnyAuthority("USER", "MERCHANT")
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/{userId}").hasAnyRole("USER", "MERCHANT", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{userId}").hasAnyRole("USER", "MERCHANT", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/{userId}").hasAnyRole("USER", "MERCHANT", "ADMIN")
 
-                        .requestMatchers(HttpMethod.GET, "/api/transactions/user/{userId}").hasAnyAuthority("USER", "MERCHANT", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/transactions/transfer").hasAnyAuthority("USER", "MERCHANT")
+                        .requestMatchers(HttpMethod.GET, "/api/transactions/user/{userId}").hasAnyRole("USER", "MERCHANT", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/transactions/transfer").hasAnyRole("USER", "MERCHANT")
 
-                        .requestMatchers(HttpMethod.GET, "/api/users/{userId}/wallet").hasAnyAuthority("USER", "MERCHANT", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/api/users/{userId}/wallet/deposit").hasAnyAuthority("USER", "MERCHANT")
+                        .requestMatchers(HttpMethod.GET, "/api/users/{userId}/wallet").hasAnyRole("USER", "MERCHANT", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/users/{userId}/wallet/deposit").hasAnyRole("USER", "MERCHANT")
 
                         .anyRequest().authenticated()
                 )

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,12 +23,14 @@ public class TransactionController {
 
     private final TransactionService transactionService;
 
+    @PreAuthorize("#id == authentication.principal")
     @PostMapping("/transfer")
     public ResponseEntity<TransactionResponseDto> createTransaction(@Valid @RequestBody TransactionRequestDto requestDto) {
         TransactionResponseDto response = transactionService.create(requestDto);
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("#userId == authentication.principal or hasRole('ADMIN')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<TransactionResponseDto>> getUserTransactions(
             @PathVariable Long userId,
