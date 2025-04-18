@@ -16,6 +16,9 @@ Link do desafio: [picpay-desafio-backend-github](https://github.com/PicPay/picpa
 - Lombok
 - Testes unitários com JUnit e Mockito
 
+### Diagrama de Classes
+<img src="assets/diagrama-de-classes.png" alt="Imagem de Diagrama de Classes">
+
 ### Endpoint de transferência
 
 ```http request
