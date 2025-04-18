@@ -1,6 +1,7 @@
 package com.desafio.picpay_simplificado.web.controller;
 
 import com.desafio.picpay_simplificado.service.UserService;
+import com.desafio.picpay_simplificado.web.dto.PageResponse;
 import com.desafio.picpay_simplificado.web.dto.UserRequestDto;
 import com.desafio.picpay_simplificado.web.dto.UserResponseDto;
 import jakarta.validation.Valid;
@@ -32,9 +33,9 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UserResponseDto>> getAllUsers(Pageable pageable) {
+    public ResponseEntity<PageResponse<UserResponseDto>> getAllUsers(Pageable pageable) {
         Page<UserResponseDto> page = userService.findAll(pageable);
-        return ResponseEntity.ok(page);
+        return ResponseEntity.ok(new PageResponse<>(page));
     }
 
     @PreAuthorize("#id == authentication.principal or hasRole('ADMIN')")
