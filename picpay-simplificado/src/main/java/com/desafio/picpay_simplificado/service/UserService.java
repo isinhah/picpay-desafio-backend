@@ -8,11 +8,13 @@ import com.desafio.picpay_simplificado.web.dto.UserResponseDto;
 import com.desafio.picpay_simplificado.web.mapper.UserMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -23,18 +25,22 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserResponseDto findById(Long id) {
+        log.info("Fetching user by ID: {}", id);
         User user = findUserById(id);
         return UserMapper.INSTANCE.toDto(user);
     }
 
     @Transactional(readOnly = true)
     public Page<UserResponseDto> findAll(Pageable pageable) {
+        log.info("Fetching all users with pagination: {}", pageable);
         return userRepository.findAll(pageable)
                 .map(UserMapper.INSTANCE::toDto);
     }
 
     @Transactional
     public UserResponseDto create(UserRequestDto registerDto) {
+        log.info("Creating new user with email: {}", registerDto.email());
+
         userValidator.validateUserEmailAndDocument(registerDto.email(), registerDto.document());
         userValidator.validateUserRoleAndDocument(registerDto.role(), registerDto.document());
 
@@ -43,13 +49,17 @@ public class UserService {
         User userToSave = UserMapper.INSTANCE.toUser(encodedDto);
         User savedUser = userRepository.save(userToSave);
 
+        log.info("User successfully created with ID: {}", savedUser.getId());
+
         walletService.createWallet(savedUser);
+        log.info("Wallet created for user ID: {}", savedUser.getId());
 
         return UserMapper.INSTANCE.toDto(savedUser);
     }
 
     @Transactional
     public UserResponseDto update(Long id, UserRequestDto updateDto) {
+        log.info("Updating user with ID: {}", id);
         User existingUser = findUserById(id);
 
         userValidator.validateUserUpdateEmailAndDocument(id, updateDto.email(), updateDto.document());
@@ -58,15 +68,18 @@ public class UserService {
         UserRequestDto encodedDto = encodePassword(updateDto);
 
         UserMapper.INSTANCE.updateFromDto(encodedDto, existingUser);
-
         User updatedUser = userRepository.save(existingUser);
+
+        log.info("User with ID {} updated successfully", id);
         return UserMapper.INSTANCE.toDto(updatedUser);
     }
 
     @Transactional
     public void delete(Long id) {
+        log.info("Deleting user with ID: {}", id);
         User user = findUserById(id);
         userRepository.delete(user);
+        log.info("User with ID {} deleted successfully", id);
     }
 
     private UserRequestDto encodePassword(UserRequestDto dto) {
