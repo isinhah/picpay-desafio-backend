@@ -38,7 +38,7 @@ public class ExceptionGlobalHandler {
                 .body(new ErrorMessage(
                         request,
                         HttpStatus.INTERNAL_SERVER_ERROR,
-                        "Notification service error: " + ex.getMessage()));
+                        ex.getMessage()));
     }
 
     @ExceptionHandler(TransactionException.class)
@@ -51,7 +51,20 @@ public class ExceptionGlobalHandler {
                 .body(new ErrorMessage(
                         request,
                         HttpStatus.BAD_REQUEST,
-                        "Transaction error: " + ex.getMessage()));
+                        ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ErrorMessage> invalidPasswordException(InvalidPasswordException ex,
+                                                                HttpServletRequest request) {
+        log.error("------ Api Error ------", ex);
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorMessage(
+                        request,
+                        HttpStatus.BAD_REQUEST,
+                        ex.getMessage()));
     }
 
     @ExceptionHandler(WalletNotFoundException.class)

@@ -6,6 +6,7 @@ import com.desafio.picpay_simplificado.web.dto.LoginRequestDto;
 import com.desafio.picpay_simplificado.web.dto.TokenResponseDto;
 import com.desafio.picpay_simplificado.web.dto.UserRequestDto;
 import com.desafio.picpay_simplificado.web.dto.UserResponseDto;
+import com.desafio.picpay_simplificado.web.exception.InvalidPasswordException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,7 +36,7 @@ public class AuthenticationService {
         User user = userService.findByEmail(dto.email());
 
         if (!passwordEncoder.matches(dto.password(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new InvalidPasswordException("Invalid password");
         }
 
         String token = tokenService.generateToken(user);
