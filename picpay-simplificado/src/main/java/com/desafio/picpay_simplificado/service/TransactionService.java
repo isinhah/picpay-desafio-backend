@@ -12,6 +12,7 @@ import com.desafio.picpay_simplificado.web.exception.TransactionException;
 import com.desafio.picpay_simplificado.web.mapper.TransactionMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class TransactionService {
@@ -29,36 +31,43 @@ public class TransactionService {
 
     @Transactional(readOnly = true)
     public Page<TransactionResponseDto> findTransactionsByUser(Long userId, Pageable pageable) {
+        log.info("Fetching transactions for user with ID: {}", userId);
         return transactionRepository.findAllByPayer_IdOrPayee_Id(userId, userId, pageable)
                 .map(TransactionMapper.INSTANCE::toDto);
     }
 
     @Transactional
     public TransactionResponseDto create(TransactionRequestDto requestDto) {
+        log.info("Starting transaction creation: Payer ID: {}, Payee ID: {}, Amount: {}",
+                requestDto.payerId(), requestDto.payeeId(), requestDto.amount());
+
         User payer = findUserById(requestDto.payerId());
         User payee = findUserById(requestDto.payeeId());
 
         validateTypeOfPayer(payer);
 
-//        if (!notificationService.isAuthorized()) {
-//            throw new RuntimeException("Unauthorized transaction.");
-//        }
-
         validatePayerBalance(payer, requestDto.amount());
 
+        log.info("Transferring amount {} from payer {} to payee {}",
+                requestDto.amount(), payer.getId(), payee.getId());
         transferAmount(payer.getWallet(), payee.getWallet(), requestDto.amount());
 
         Transaction transaction = TransactionMapper.INSTANCE.toEntity(requestDto, payer, payee);
 
         Transaction savedTransaction = transactionRepository.save(transaction);
 
-//        notificationService.sendNotification(payee.getEmail());
+        log.info("Transaction successfully created. Transaction ID: {}", savedTransaction.getId());
+
+        // notificationService.sendNotification(payee.getEmail());
+        // log.info("Notification sent to payee: {}", payee.getEmail());
 
         return TransactionMapper.INSTANCE.toDto(savedTransaction);
     }
 
     public void validateTypeOfPayer(User payer) {
+        log.debug("Validating payer type for user ID: {}", payer.getId());
         if (payer.getRole() == UserRole.MERCHANT) {
+            log.warn("Merchant user (ID: {}) tried to send money, which is not allowed.", payer.getId());
             throw new TransactionException("Merchants cannot send money, only receive.");
         }
     }
@@ -67,11 +76,15 @@ public class TransactionService {
         Wallet payerWallet = payer.getWallet();
 
         if (payerWallet == null || payerWallet.getBalance().compareTo(amount) < 0) {
+            log.error("Insufficient balance for user ID: {}. Attempted transaction amount: {}",
+                    payer.getId(), amount);
             throw new TransactionException("Insufficient balance for the transaction.");
         }
+        log.debug("Sufficient balance for user ID: {}. Proceeding with transaction.", payer.getId());
     }
 
     private void transferAmount(Wallet payerWallet, Wallet payeeWallet, BigDecimal amount) {
+        log.debug("Transferring {} from payer's wallet to payee's wallet.", amount);
         payerWallet.setBalance(payerWallet.getBalance().subtract(amount));
         payeeWallet.setBalance(payeeWallet.getBalance().add(amount));
     }
