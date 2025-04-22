@@ -38,15 +38,7 @@ public class UserService {
         userValidator.validateUserEmailAndDocument(registerDto.email(), registerDto.document());
         userValidator.validateUserRoleAndDocument(registerDto.role(), registerDto.document());
 
-        String encodedPassword = userValidator.encodePassword(registerDto.password());
-
-        UserRequestDto encodedDto = new UserRequestDto(
-                registerDto.name(),
-                registerDto.document(),
-                registerDto.email(),
-                encodedPassword,
-                registerDto.role()
-        );
+        UserRequestDto encodedDto = encodePassword(registerDto);
 
         User userToSave = UserMapper.INSTANCE.toUser(encodedDto);
         User savedUser = userRepository.save(userToSave);
@@ -63,15 +55,7 @@ public class UserService {
         userValidator.validateUserUpdateEmailAndDocument(id, updateDto.email(), updateDto.document());
         userValidator.validateUserRoleAndDocument(updateDto.role(), updateDto.document());
 
-        String encodedPassword = userValidator.encodePassword(updateDto.password());
-
-        UserRequestDto encodedDto = new UserRequestDto(
-                updateDto.name(),
-                updateDto.document(),
-                updateDto.email(),
-                encodedPassword,
-                updateDto.role()
-        );
+        UserRequestDto encodedDto = encodePassword(updateDto);
 
         UserMapper.INSTANCE.updateFromDto(encodedDto, existingUser);
 
@@ -83,6 +67,17 @@ public class UserService {
     public void delete(Long id) {
         User user = findUserById(id);
         userRepository.delete(user);
+    }
+
+    private UserRequestDto encodePassword(UserRequestDto dto) {
+        String encodedPassword = userValidator.encodePassword(dto.password());
+        return new UserRequestDto(
+                dto.name(),
+                dto.document(),
+                dto.email(),
+                encodedPassword,
+                dto.role()
+        );
     }
 
     public User findUserById(Long id) {
