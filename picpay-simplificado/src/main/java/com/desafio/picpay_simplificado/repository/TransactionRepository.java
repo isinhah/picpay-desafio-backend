@@ -6,9 +6,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     Page<Transaction> findAllByPayer_IdOrPayee_Id(Long payerId, Long payeeId, Pageable pageable);
 
+    List<Transaction> findByCreatedAtAfter(LocalDateTime createdAt);
 }
