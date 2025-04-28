@@ -13,6 +13,8 @@ import com.desafio.picpay_simplificado.web.mapper.TransactionMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class TransactionService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;
 
+    @Cacheable(value = "transactions", key = "#userId")
     @Transactional(readOnly = true)
     public Page<TransactionResponseDto> findTransactionsByUser(Long userId, Pageable pageable) {
         log.info("Fetching transactions for user with ID: {}", userId);
@@ -36,6 +39,7 @@ public class TransactionService {
                 .map(TransactionMapper.INSTANCE::toDto);
     }
 
+    @CacheEvict(value = "transactions", key = "#requestDto.payerId()")
     @Transactional
     public TransactionResponseDto create(TransactionRequestDto requestDto) {
         log.info("Starting transaction creation: Payer ID: {}, Payee ID: {}, Amount: {}",

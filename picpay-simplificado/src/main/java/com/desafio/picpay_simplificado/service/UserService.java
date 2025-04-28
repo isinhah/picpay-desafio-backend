@@ -9,6 +9,8 @@ import com.desafio.picpay_simplificado.web.mapper.UserMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class UserService {
     private final WalletService walletService;
     private final UserValidator userValidator;
 
+    @Cacheable(value = "users", key = "#id")
     @Transactional(readOnly = true)
     public UserResponseDto findById(Long id) {
         log.info("Fetching user by ID: {}", id);
@@ -57,6 +60,7 @@ public class UserService {
         return UserMapper.INSTANCE.toDto(savedUser);
     }
 
+    @CacheEvict(value = "users", key = "#id")
     @Transactional
     public UserResponseDto update(Long id, UserRequestDto updateDto) {
         log.info("Updating user with ID: {}", id);
@@ -74,6 +78,7 @@ public class UserService {
         return UserMapper.INSTANCE.toDto(updatedUser);
     }
 
+    @CacheEvict(value = "users", key = "#id")
     @Transactional
     public void delete(Long id) {
         log.info("Deleting user with ID: {}", id);

@@ -9,6 +9,8 @@ import com.desafio.picpay_simplificado.web.exception.WalletNotFoundException;
 import com.desafio.picpay_simplificado.web.mapper.WalletMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,7 @@ public class WalletService {
 
     private final WalletRepository walletRepository;
 
+    @Cacheable(value = "wallets", key = "#userId")
     @Transactional(readOnly = true)
     public WalletResponseDto findByUser(Long userId) {
         log.info("Searching for wallet by user ID: {}", userId);
@@ -37,6 +40,7 @@ public class WalletService {
         log.info("Wallet successfully created for user ID: {}", user.getId());
     }
 
+    @CacheEvict(value = "wallets", key = "#userId")
     @Transactional
     public WalletResponseDto depositToWallet(Long userId, WalletDepositDto depositDto) {
         log.info("Depositing amount {} into wallet of user ID: {}", depositDto.amount(), userId);
