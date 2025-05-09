@@ -18,7 +18,6 @@ public class StatisticsService {
 
     private final TransactionRepository transactionRepository;
 
-    @Cacheable(value = "transactionStatistics", key = "#root.methodName + #oneMinuteAgo")
     public DoubleSummaryStatistics getStatistics() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime oneMinuteAgo = now.minusSeconds(60);
