@@ -6,38 +6,38 @@ de dinheiro entre usuários.
 Temos 2 tipos de usuários, os comuns e lojistas, ambos têm carteira com dinheiro e realizam
 transferências entre eles.
 
-Link do desafio: [picpay-desafio-backend-github](https://github.com/PicPay/picpay-desafio-backend)
+Link do Desafio: [picpay-desafio-backend-github](https://github.com/PicPay/picpay-desafio-backend)
 
-### Tecnologias Utilizadas
+### Tecnologias
 - Java
 - Spring Boot
-- Autenticação com JWT (JSON Web Token)
-- Cache em memória (Spring Cache)
+- Autenticação com JWT
+- Cache em Memória
 - Maven
 - H2 Database
+- JUnit e Mockito
 - Mapstruct
 - Lombok
-- Testes unitários com JUnit e Mockito
 
-### Requisitos do Desafio
-Lojistas só recebem transferências:
+### Endpoints
 
-<img src="assets/lojista-transferencia.png" alt="Imagem de exceção para lojista" width="500">
+`POST /api/users/{userId}/wallet/deposit`
 
-Validar se o usuário tem saldo antes da transferência:
-
-<img src="assets/saldo-do-usuario.png" alt="Imagem de exceção para usuário" width="500">
-
-### Endpoint de Transferência
-
-```http request
-POST /transfer
-Content-Type: application/json
-
+Realiza um depósito na carteira do usuário comum especificado:
+```json
 {
-  "value": 100.0,
-  "payer": 4,
-  "payee": 15
+  "amount": "200.00"
+}
+```
+
+`POST /api/transactions/transfer`
+
+Efetua a transferência de dinheiro entre um usuário comum e um lojista:
+```json
+{
+  "amount": "200.00",
+  "payerId": "1",
+  "payeeId": "2"
 }
 ```
 
